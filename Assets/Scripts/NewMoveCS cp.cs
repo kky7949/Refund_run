@@ -15,18 +15,28 @@ public class NewMoveCS : MonoBehaviour
 
     private Vector3 startPosition;
     private bool isDead = false;
+
+    private float deadTimer = 0.0f;
+    private float respawnTime = 1.5f;
     
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         anim = GetComponent<Animator>();
+        startPosition = transform.position;
     }
 
 
     void Update()
     {
-        if (isDead) return;
+        if (isDead){
+            deadTimer += Time.deltaTime;
+            if (deadTimer >= respawnTime){
+                Respawn();
+            }
+            return;
+        }
 
         Vector2 input = Vector2.zero;
         if (Keyboard.current != null) {
@@ -70,21 +80,19 @@ public class NewMoveCS : MonoBehaviour
         }
         else if (collision.gameObject.CompareTag("Obstacle") && !isDead)
         {
-            StartCoroutine(DieAndRespawn());
+            DeathTrigger();
         }
     }
 
-    IEnumerator DieAndRespawn()
+    void DeathTrigger()
     {
         isDead = true;
-
+        deadTimer = 0.0f;
         anim.SetTrigger("die");
+    }
 
-        rb.linearVelocity = Vector3.zero;
-        rb.angularVelocity = Vector3.zero;
-
-        yield return new WaitForSeconds(1.5f);
-
+    void Respawn()
+    {
         transform.position = startPosition;
         anim.Play("Idle", 0, 0f);
         isDead = false;

@@ -14,7 +14,6 @@ public class SceneMove : MonoBehaviour
     {
         if (panel != null)
         {
-            // 패널이 켜져있으면 끄고, 꺼져있으면 켭니다.
             bool isActive = panel.activeSelf;
             panel.SetActive(!isActive);
         }
