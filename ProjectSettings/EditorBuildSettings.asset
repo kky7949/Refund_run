@@ -14,6 +14,12 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/End.unity
     guid: 8aab66aff694f4d4e8d350843b381874
+  - enabled: 1
+    path: Assets/Scenes/ScalePuzzle.unity
+    guid: 0e4ace995bb96cd41aa616a98243691f
+  - enabled: 1
+    path: Assets/Scenes/RefundRun_Platformer.unity
+    guid: 58f45ce7fd6f2c84ba5761111379fd9b
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0
