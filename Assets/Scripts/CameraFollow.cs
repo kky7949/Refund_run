@@ -12,7 +12,7 @@ public class CameraFollow : MonoBehaviour
         {
             // 캐릭터의 X 위치만
             Vector3 targetPosition = new Vector3(target.position.x, target.position.y + offsetY, target.position.z + offsetZ);
-            
+
             // 카메라의 위치를 업데이트
             transform.position = targetPosition;
         }
