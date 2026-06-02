@@ -10,7 +10,7 @@ using UnityEngine.UI;
 
 public static class ScalePuzzleSceneBuilder
 {
-    private const string ScenePath = "Assets/Scenes/ScalePuzzle.unity";
+    private const string ScenePath = "Assets/_WIP/yongwoo/Scenes/ScalePuzzle.unity";
     private const string FontSourcePath = "C:/Windows/Fonts/NotoSansKR-VF.ttf";
     private const string FontCopyPath = "Assets/Fonts/NotoSansKR-VF.ttf";
     private static readonly Color Background = new Color(0.10f, 0.12f, 0.15f);

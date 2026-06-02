@@ -9,7 +9,7 @@
 - `Assets/AIHarness/Editor`에 AI inspection/safety editor tools 설치.
 - `unity-cli` 검증 통과: `list`, `scene_status`, `safe_refresh --compile true`, `console --type error`.
 - 기획안 PDF를 `Assets/Docs/환불런 (Refund Run) 게임기획안.pdf`로 복사.
-- 저울 무게추 퍼즐 씬 `Assets/Scenes/ScalePuzzle.unity` 추가.
+- 저울 무게추 퍼즐 씬 `Assets/_WIP/yongwoo/Scenes/ScalePuzzle.unity` 추가.
 - `ScalePuzzleController`를 레이튼식 무게추 추리 퍼즐로 변경: 랜덤 템플릿, 제한 저울질, 좌/우 접시 드래그 배치, 기록, 정답 후보 선택, 결정 처리.
 - 퍼즐 씬은 UI 전용 보드로 재구성: 문제 카드, 저울 접시, 정답 트레이, 추 풀, 행동 버튼을 한 화면에서 조작.
 - 추는 `ScalePuzzleWeightItem`으로 드래그하고, `ScalePuzzleDropZone`이 좌/우 접시와 정답 트레이 드롭을 처리한다.
@@ -21,7 +21,7 @@
 - 검증 스크린샷: `Temp/scale_puzzle_drag_ui_polished.png`.
 - 콘솔 에러 없음 확인.
 - `Stage1`은 다른 사람 작업 씬으로 보고 변경하지 않도록 원본 상태로 복구했다.
-- 새 플랫포머 씬 `Assets/Scenes/RefundRun_Platformer.unity` 추가.
+- 새 플랫포머 씬 `Assets/_WIP/yongwoo/Scenes/RefundRun_Platformer.unity` 추가.
 - `RefundRun_Platformer`는 `Palmov Island/Low Poly Atmospheric Locations Pack`의 downtown 환경 프리팹과 플랫폼 큐브로 맵을 구성한다.
 - `Mini Simple Characters Demo` 캐릭터 프리팹 루트에 기존 `NewMoveCS`를 붙여 `Stage1`과 같은 Player 구조/이동 방식을 사용한다.
 - `Quiz Chest`에 `ScalePuzzleTrigger`를 붙여 접촉 시 `ScalePuzzle` 씬을 additive overlay로 로드한다.
@@ -32,6 +32,8 @@
 - 새 씬의 플레이어 이동이 별도 2.5D 컨트롤러라 `Stage1`과 다르게 느껴지던 문제를 수정했다. `PlatformerPlayerController`는 제거하고 `NewMoveCS` 기반으로 재빌드했다.
 - `ScalePuzzle` 저울 기울기 방향을 실제 무거운 접시 쪽이 내려가도록 수정했다.
 - `ScalePuzzle` UI 문구를 한글로 바꾸고 `NotoSansKR-VF` 폰트를 `Assets/Fonts`에 추가해 한글 네모 표시를 피했다.
+- 기존 `Assets/_WIP/main` 개인 작업 폴더를 `Assets/_WIP/yongwoo`로 옮겨 메인 브랜치 이름과 개인 작업공간 이름이 섞이지 않게 했다.
+- 우리가 만든 `RefundRun_Platformer`, `ScalePuzzle`, 관련 트리거/퍼즐/빌더 스크립트를 `Assets/_WIP/yongwoo` 아래로 옮겼다.
 
 ## 핵심 설계 결정
 
@@ -40,6 +42,9 @@
 - Unity 자산 구조 확인은 가능하면 `unity-scanner`를 우선한다.
 - 사람이 Inspector/Scene에서 조정한 값은 현재 source of truth로 본다.
 - 다른 사람이 만든 씬은 직접 확장하지 않고, 참고만 한 뒤 새 씬을 만들어 작업한다.
+- 현재 협업 방식은 `main`에서 직접 작업하되, 각자 소유 씬에서만 맵/함정/퀴즈를 편집한다.
+- 개인 작업 파일은 `Assets/_WIP/<name>` 아래에 둔다. Yongwoo 개인 폴더는 `Assets/_WIP/yongwoo`다.
+- `Stage1`은 기준 씬으로만 사용한다. 새 맵은 `Stage1`을 복사해 각자 씬을 만든 뒤 꾸미고 함정/퀴즈를 추가한다.
 - 저울 퀴즈는 새 UI를 만들지 않고 `ScalePuzzle` 씬을 additive overlay로 재사용한다.
 - 캐릭터 이동은 새 컨트롤러를 만들기보다 기존 씬의 검증된 `NewMoveCS` 구조를 우선 재사용한다.
 

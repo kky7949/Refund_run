@@ -2,7 +2,8 @@
 
 ## Branches
 
-- Work on a feature branch.
+- Current project workflow is direct work on `main` unless the team explicitly asks for a feature branch.
+- Personal work files go under `Assets/_WIP/<name>`; Yongwoo's folder is `Assets/_WIP/yongwoo`.
 - Make a checkpoint commit before risky Unity operations:
   - scene-wide changes
   - asset refresh with compile
@@ -12,6 +13,11 @@
 ## Unity Scenes
 
 - Decide scene ownership before multiple people edit the same scene.
+- Each person works in their own scene. Do not edit another person's scene directly.
+- Put owned draft scenes, helper objects, and local notes in the matching personal `_WIP` folder when they are not ready to be shared.
+- Treat `Stage1` as the reference/base scene for copying layout, player setup, movement feel, map structure, traps, and quiz placement ideas.
+- To build a new map, duplicate/copy from `Stage1` into a new owned scene first, then decorate the map and add traps, quiz triggers, or puzzle hookups in that owned scene.
+- Existing shared/reference scenes, including `Stage1`, are read-only unless the scene owner explicitly asks for a direct edit.
 - If a scene is dirty, do not refresh, enter Play Mode, or save automatically without checking intent.
 - Do not regenerate scene content that a person manually positioned unless explicitly asked.
 

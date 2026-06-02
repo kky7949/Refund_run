@@ -1,6 +1,6 @@
-﻿# main Workspace Rules
+# yongwoo Workspace Rules
 
-This file contains local rules for work under this folder.
+This file contains local rules for Yongwoo's personal work folder.
 
 ## Communication
 
@@ -21,4 +21,3 @@ This file contains local rules for work under this folder.
 - Editor tools should preserve manual Transform, Sprite, Collider, Animator, and serialized field values.
 - Builders should add missing pieces, not rebuild working content.
 - Use clear child names like `Visual`, `Collider`, `Sensors`, `UI`, and `Debug`.
-

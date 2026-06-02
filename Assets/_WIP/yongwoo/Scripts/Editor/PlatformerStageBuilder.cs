@@ -4,7 +4,7 @@ using UnityEngine;
 
 public static class PlatformerStageBuilder
 {
-    private const string ScenePath = "Assets/Scenes/RefundRun_Platformer.unity";
+    private const string ScenePath = "Assets/_WIP/yongwoo/Scenes/RefundRun_Platformer.unity";
     private const string RootName = "[Generated] Platformer Map";
 
     [MenuItem("Refund Run/Build RefundRun Platformer Scene")]
@@ -40,7 +40,7 @@ public static class PlatformerStageBuilder
         EditorSceneManager.MarkSceneDirty(scene);
         EditorSceneManager.SaveScene(scene, ScenePath);
         EnsureBuildScene(ScenePath);
-        EnsureBuildScene("Assets/Scenes/ScalePuzzle.unity");
+        EnsureBuildScene("Assets/_WIP/yongwoo/Scenes/ScalePuzzle.unity");
         AssetDatabase.SaveAssets();
     }
 
