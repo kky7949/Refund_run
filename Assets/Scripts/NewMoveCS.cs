@@ -1,94 +1,110 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using System.Collections;
-
 
 public class NewMoveCS : MonoBehaviour
 {
     public float Speed = 50.0f;
     public float RotateSpeed = 100.0f;
-    public float JumpForce = 5.0f;  //º¯¼ö ¼±¾ğ
-
-    private Rigidbody rb;   //¹°¸®¿£ÁøÀ» ´ã´çÇÏ´Â ÄÄÆ÷³ÍÆ®
-    private Animator anim;   //¾Ö´Ï¸ŞÀÌ¼ÇÀ» ´ã´çÇÏ´Â ÄÄÆ÷³ÍÆ®
-    private bool isGrounded = true;    //Ä³¸¯ÅÍ°¡ ¶¥¿¡ ´ê¾ÆÀÖ´ÂÁö È®ÀÎÇÏ´Â ±â¾ïº¯¼ö
+    public float JumpForce = 5.0f;  //ë³€ìˆ˜ ì„ ì–¸
+    public GameObject nextStageBtn;
+    
+    private Rigidbody rb;   //ë¬¼ë¦¬ì—”ì§„ì„ ë‹´ë‹¹í•˜ëŠ” ì»´í¬ë„ŒíŠ¸
+    private Animator anim;   //ì• ë‹ˆë©”ì´ì…˜ì„ ë‹´ë‹¹í•˜ëŠ” ì»´í¬ë„ŒíŠ¸
+    private bool isGrounded = true;    //ìºë¦­í„°ê°€ ë•…ì— ë‹¿ì•„ìˆëŠ”ì§€ í™•ì¸í•˜ëŠ” ê¸°ì–µë³€ìˆ˜
 
     private Vector3 startPosition;
     private bool isDead = false;
 
+    private float deadTimer = 0.0f;
+    private float respawnTime = 1.5f;
+    
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         anim = GetComponent<Animator>();
+        startPosition = transform.position;
     }
 
 
     void Update()
     {
-        if (isDead) return;
+        if (isDead){
+            deadTimer += Time.deltaTime;
+            if (deadTimer >= respawnTime){
+                Respawn();
+            }
+            return;
+        }
 
         Vector2 input = Vector2.zero;
-        if (Keyboard.current != null)
-        {
+        if (Keyboard.current != null) {
             if (Keyboard.current.aKey.isPressed) input.x = -1;
             if (Keyboard.current.dKey.isPressed) input.x = 1;
             if (Keyboard.current.wKey.isPressed) input.y = 1;
             if (Keyboard.current.sKey.isPressed) input.y = -1;
 
-            if (Keyboard.current.spaceKey.wasPressedThisFrame && isGrounded)
-            { // ½ºÆäÀÌ½º¹Ù¸¦ ´©¸¥ ¼ø°£¿¡¸¸ ¹İÀÀ || ½ºÆäÀÌ½º¹Ù¸¦ ´­·¶´õ¶óµµ ¶¥¿¡ ÀÖÀ» ¶§¸¸ Á¡ÇÁ
+            if (Keyboard.current.spaceKey.wasPressedThisFrame && isGrounded) { // ìŠ¤í˜ì´ìŠ¤ë°”ë¥¼ ëˆ„ë¥¸ ìˆœê°„ì—ë§Œ ë°˜ì‘ || ìŠ¤í˜ì´ìŠ¤ë°”ë¥¼ ëˆŒë €ë”ë¼ë„ ë•…ì— ìˆì„ ë•Œë§Œ ì í”„
                 rb.AddForce(Vector3.up * JumpForce, ForceMode.Impulse);
                 isGrounded = false;
             }
         }
-        // Å°º¸µå ÀÔ·Â ½ºÅ©¸³Æ®
+        // í‚¤ë³´ë“œ ì…ë ¥ ìŠ¤í¬ë¦½íŠ¸
         //float h = Input.GetAxis("Horizontal");
         //float v = Input.GetAxis("Vertical");
 
-        if (input.x != 0 || input.y != 0)
-        {
+        if (input.x !=0 || input.y !=0) {
             anim.SetBool("isMoving", true);
         }
-        else
-        {
+        else {
             anim.SetBool("isMoving", false);
         }
 
         anim.SetBool("isGrounded", isGrounded);
 
-        // ÀÌµ¿ °Å¸® º¸Á¤ ½ºÅ©¸³Æ®
+        // ì´ë™ ê±°ë¦¬ ë³´ì • ìŠ¤í¬ë¦½íŠ¸
         float h = input.x * RotateSpeed * Time.deltaTime;
         float v = input.y * Speed * Time.deltaTime;
 
-        // ½ÇÁ¦ ÀÌµ¿ ½ºÅ©¸³Æ®
+        // ì‹¤ì œ ì´ë™ ìŠ¤í¬ë¦½íŠ¸
         transform.Rotate(Vector3.up * h);
         transform.Translate(Vector3.forward * v);
     }
 
-    void OnCollisionEnter(Collision collision)  //Ãæµ¿ÇÏ´Â ¼ø°£ ÀÚµ¿ È£ÃâµÇ´Â ÇÔ¼ö
+    void OnCollisionEnter(Collision collision)  //ì¶©ë™í•˜ëŠ” ìˆœê°„ ìë™ í˜¸ì¶œë˜ëŠ” í•¨ìˆ˜
     {
+        if (!this.enabled) return;
         if (collision.gameObject.CompareTag("Ground"))
         {
             isGrounded = true;
         }
         else if (collision.gameObject.CompareTag("Obstacle") && !isDead)
         {
-            StartCoroutine(DieAndRespawn());
+            DeathTrigger();
+        }
+        else if (collision.gameObject.CompareTag("OneLinePuzzleStart")) // **í¼ì¦ ì‹œì‘ì„ ìœ„í•œ ì¡°ê±´ ì¶”ê°€**
+        {
+            GetComponent<OneLinePuzzlePlayerController>().enabled = true;
+        }
+        else if (collision.gameObject.CompareTag("Trampoline")) // **íŠ¸ë¨í„ë¦° ê¸°ë¯¹ì„ ìœ„í•œ ì¡°ê±´ ì¶”ê°€**
+        {
+            rb.AddForce(Vector3.up * 12.0f, ForceMode.Impulse);
+        }
+        else if (collision.gameObject.CompareTag("Goal")) // **ìŠ¤í…Œì´ì§€ ì´ë™ì„ ìœ„í•œ ì¡°ê±´ ì¶”ê°€**
+        {
+            nextStageBtn.SetActive(true);
         }
     }
 
-    IEnumerator DieAndRespawn()
+    void DeathTrigger()
     {
         isDead = true;
-
+        deadTimer = 0.0f;
         anim.SetTrigger("die");
+    }
 
-        rb.linearVelocity = Vector3.zero;
-        rb.angularVelocity = Vector3.zero;
-
-        yield return new WaitForSeconds(1.5f);
-
+    void Respawn()
+    {
         transform.position = startPosition;
         anim.Play("Idle", 0, 0f);
         isDead = false;

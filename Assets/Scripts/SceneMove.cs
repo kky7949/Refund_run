@@ -3,29 +3,27 @@ using UnityEngine.SceneManagement;
 
 public class SceneMove : MonoBehaviour
 {
-    // ¾À ÀÌ¸§À» ¸Å°³º¯¼ö·Î ¹Ş¾Æ ÇØ´ç ¾ÀÀ¸·Î ÀÌµ¿ÇÏ´Â ÇÏ³ªÀÇ ÇÔ¼ö·Î ÅëÇÕ
-    public void LoadSceneByName(string sceneName)
+    // ì”¬ ì´ë¦„ì„ ë§¤ê°œë³€ìˆ˜ë¡œ ë°›ì•„ í•´ë‹¹ ì”¬ìœ¼ë¡œ ì´ë™í•˜ëŠ” í•˜ë‚˜ì˜ í•¨ìˆ˜ë¡œ í†µí•©
+    public void LoadSceneByName(string sceneName) 
     {
         SceneManager.LoadScene(sceneName);
     }
 
-    // È¯°æ¼³Á¤ Ã¢ °°Àº UI ÆĞ³ÎÀ» ÄÑ°í ²ô±â À§ÇÑ ÇÔ¼ö -> (¾À ÀüÈ¯ ¾øÀÌ È­¸é¿¡ ¶ç¿ì±â)
+    // í™˜ê²½ì„¤ì • ì°½ ê°™ì€ UI íŒ¨ë„ì„ ì¼œê³  ë„ê¸° ìœ„í•œ í•¨ìˆ˜ -> (ì”¬ ì „í™˜ ì—†ì´ í™”ë©´ì— ë„ìš°ê¸°)
     public void TogglePanel(GameObject panel)
     {
         if (panel != null)
         {
-            // ÆĞ³ÎÀÌ ÄÑÁ®ÀÖÀ¸¸é ²ô°í, ²¨Á®ÀÖÀ¸¸é ÄÕ´Ï´Ù.
             bool isActive = panel.activeSelf;
             panel.SetActive(!isActive);
         }
     }
 
-    public void Quit()
-    {
-#if UNITY_EDITOR
+    public void Quit() {
+        #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
-#else
+        #else
         Application.Quit();
-#endif
+        #endif   
     }
 }
