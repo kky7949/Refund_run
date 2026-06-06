@@ -6,11 +6,6 @@ TagManager:
   tags:
   - Ground
   - Obstacle
-  - OneLinePuzzleStart
-  - Bridge
-  - Trampoline
-  - Lava
-  - Goal
   layers:
   - Default
   - TransparentFX
