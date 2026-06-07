@@ -20,6 +20,7 @@ public static class ScalePuzzleSceneBuilder
     private static readonly Color Brass = new Color(0.66f, 0.56f, 0.30f, 1f);
     private static readonly Color Ink = new Color(0.07f, 0.08f, 0.09f, 1f);
     private static Font koreanFont;
+    private const bool LowEndUi = true;
 
     [MenuItem("Refund Run/Build Scale Puzzle Scene")]
     public static void BuildScene()
@@ -30,8 +31,8 @@ public static class ScalePuzzleSceneBuilder
         Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
         scene.name = "ScalePuzzle";
 
-        Camera sceneCamera = CreateCamera();
-        GameObject canvas = CreateCanvas(sceneCamera);
+        CreateCamera();
+        GameObject canvas = CreateCanvas();
         RectTransform canvasRect = canvas.GetComponent<RectTransform>();
 
         CreatePanel(canvas.transform, "Background", Vector2.zero, new Vector2(1920f, 1080f), Background, false);
@@ -117,7 +118,7 @@ public static class ScalePuzzleSceneBuilder
 
     private static RectTransform CreateDropContent(ScalePuzzleController controller, Transform parent, string name, ScalePuzzleController.Zone zone, Vector2 position, Vector2 size, bool grid)
     {
-        RectTransform rect = CreatePanel(parent, name, position, size, new Color(1f, 1f, 1f, 0.035f), false);
+        RectTransform rect = CreatePanel(parent, name, position, size, new Color(1f, 1f, 1f, 0.035f), false, true);
         ScalePuzzleDropZone dropZone = rect.gameObject.AddComponent<ScalePuzzleDropZone>();
         dropZone.controller = controller;
         dropZone.zone = zone;
@@ -157,9 +158,13 @@ public static class ScalePuzzleSceneBuilder
 
             Image body = token.AddComponent<Image>();
             body.color = new Color(0.24f, 0.25f, 0.29f);
-            Shadow shadow = token.AddComponent<Shadow>();
-            shadow.effectColor = new Color(0f, 0f, 0f, 0.45f);
-            shadow.effectDistance = new Vector2(4f, -4f);
+            body.raycastTarget = true;
+            if (!LowEndUi)
+            {
+                Shadow shadow = token.AddComponent<Shadow>();
+                shadow.effectColor = new Color(0f, 0f, 0f, 0.45f);
+                shadow.effectDistance = new Vector2(4f, -4f);
+            }
             token.AddComponent<CanvasGroup>();
 
             GameObject rim = new GameObject("Rim");
@@ -171,11 +176,15 @@ public static class ScalePuzzleSceneBuilder
             rimRect.offsetMax = Vector2.zero;
             Image rimImage = rim.AddComponent<Image>();
             rimImage.color = new Color(0.56f, 0.57f, 0.62f);
+            rimImage.raycastTarget = false;
 
             Text number = CreateText(rect, "Number", (i + 1).ToString(), new Vector2(0f, -4f), new Vector2(64f, 58f), 28, Color.white, TextAnchor.MiddleCenter);
-            Outline outline = number.gameObject.AddComponent<Outline>();
-            outline.effectColor = new Color(0f, 0f, 0f, 0.45f);
-            outline.effectDistance = new Vector2(1f, -1f);
+            if (!LowEndUi)
+            {
+                Outline outline = number.gameObject.AddComponent<Outline>();
+                outline.effectColor = new Color(0f, 0f, 0f, 0.45f);
+                outline.effectDistance = new Vector2(1f, -1f);
+            }
 
             ScalePuzzleWeightItem item = token.AddComponent<ScalePuzzleWeightItem>();
             item.numberText = number;
@@ -196,19 +205,17 @@ public static class ScalePuzzleSceneBuilder
         camera.backgroundColor = Background;
         camera.orthographic = true;
         camera.orthographicSize = 540f;
-        cameraGo.AddComponent<AudioListener>();
+        camera.enabled = false;
         return camera;
     }
 
-    private static GameObject CreateCanvas(Camera sceneCamera)
+    private static GameObject CreateCanvas()
     {
         GameObject canvasGo = new GameObject("Canvas");
         RectTransform rect = canvasGo.AddComponent<RectTransform>();
         rect.sizeDelta = new Vector2(1920f, 1080f);
         Canvas canvas = canvasGo.AddComponent<Canvas>();
-        canvas.renderMode = RenderMode.ScreenSpaceCamera;
-        canvas.worldCamera = sceneCamera;
-        canvas.planeDistance = 2f;
+        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
         CanvasScaler scaler = canvasGo.AddComponent<CanvasScaler>();
         scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
         scaler.referenceResolution = new Vector2(1920f, 1080f);
@@ -229,13 +236,13 @@ public static class ScalePuzzleSceneBuilder
         return rect;
     }
 
-    private static RectTransform CreatePanel(Transform parent, string name, Vector2 position, Vector2 size, Color color, bool addShadow)
+    private static RectTransform CreatePanel(Transform parent, string name, Vector2 position, Vector2 size, Color color, bool addShadow, bool raycastTarget = false)
     {
         RectTransform rect = CreateRect(parent, name, position, size);
         Image image = rect.gameObject.AddComponent<Image>();
         image.color = color;
-        image.raycastTarget = true;
-        if (addShadow)
+        image.raycastTarget = raycastTarget;
+        if (addShadow && !LowEndUi)
         {
             Shadow shadow = rect.gameObject.AddComponent<Shadow>();
             shadow.effectColor = new Color(0f, 0f, 0f, 0.35f);
@@ -299,7 +306,7 @@ public static class ScalePuzzleSceneBuilder
 
     private static Button CreateButton(Transform parent, string name, string text, Vector2 position, Vector2 size, int fontSize, Color color)
     {
-        RectTransform rect = CreatePanel(parent, name, position, size, color, true);
+        RectTransform rect = CreatePanel(parent, name, position, size, color, true, true);
         Button button = rect.gameObject.AddComponent<Button>();
         ColorBlock colors = button.colors;
         colors.normalColor = color;

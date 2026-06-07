@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class ScalePuzzleController : MonoBehaviour
@@ -63,6 +65,9 @@ public class ScalePuzzleController : MonoBehaviour
     public Button resetButton;
     public Button newPuzzleButton;
 
+    [Header("Performance")]
+    public bool lowEndOverlayMode = true;
+
     private readonly Zone[] placements = new Zone[12];
     private readonly System.Random random = new System.Random();
     private readonly StringBuilder history = new StringBuilder();
@@ -77,6 +82,11 @@ public class ScalePuzzleController : MonoBehaviour
 
     private void Awake()
     {
+        if (lowEndOverlayMode)
+        {
+            ApplyLowEndOverlaySettings();
+        }
+
         leftPanStart = leftPan != null ? leftPan.anchoredPosition : Vector2.zero;
         rightPanStart = rightPan != null ? rightPan.anchoredPosition : Vector2.zero;
 
@@ -118,7 +128,7 @@ public class ScalePuzzleController : MonoBehaviour
                 if (i != index && placements[i] == Zone.Answer)
                 {
                     placements[i] = Zone.Pool;
-                    SnapWeight(i);
+                    RefreshWeight(i);
                 }
             }
 
@@ -130,8 +140,9 @@ public class ScalePuzzleController : MonoBehaviour
         }
 
         placements[index] = zone;
+        RefreshWeight(index);
         feedbackText.text = "추를 올렸어. 양쪽 접시 개수를 맞춘 뒤 저울질을 눌러.";
-        UpdateAll();
+        UpdateInterface();
     }
 
     public void SnapWeight(int index)
@@ -169,7 +180,8 @@ public class ScalePuzzleController : MonoBehaviour
         }
 
         feedbackText.text = "추를 양쪽 접시에 같은 개수로 올려서 비교해.";
-        UpdateAll();
+        RefreshAllWeights();
+        UpdateInterface();
     }
 
     public void ResetCurrentPuzzle()
@@ -192,7 +204,8 @@ public class ScalePuzzleController : MonoBehaviour
         }
 
         feedbackText.text = "초기화했어. 숨겨진 정답 추는 그대로야.";
-        UpdateAll();
+        RefreshAllWeights();
+        UpdateInterface();
     }
 
     public void Weigh()
@@ -205,7 +218,7 @@ public class ScalePuzzleController : MonoBehaviour
         if (remainingWeighs <= 0)
         {
             feedbackText.text = "저울질 기회를 모두 썼어. 정답 칸에 추 하나를 올리고 결정해.";
-            UpdateAll();
+            UpdateInterface();
             return;
         }
 
@@ -214,7 +227,7 @@ public class ScalePuzzleController : MonoBehaviour
         if (left.Count == 0 || left.Count != right.Count)
         {
             feedbackText.text = "양쪽 접시에 같은 개수의 추를 올려야 해.";
-            UpdateAll();
+            UpdateInterface();
             return;
         }
 
@@ -226,7 +239,7 @@ public class ScalePuzzleController : MonoBehaviour
         string result = lastDelta == 0 ? "수평" : lastDelta > 0 ? "왼쪽 무거움" : "오른쪽 무거움";
         history.AppendLine($"{currentTemplate.maxWeighs - remainingWeighs}) 왼쪽:{FormatIndexes(left)} / 오른쪽:{FormatIndexes(right)} -> {result}");
         feedbackText.text = ResultText(lastDelta);
-        UpdateAll();
+        UpdateInterface();
     }
 
     public void Decide()
@@ -239,7 +252,7 @@ public class ScalePuzzleController : MonoBehaviour
         if (answerIndex < 0)
         {
             feedbackText.text = "정답 칸에 추 하나를 먼저 올려.";
-            UpdateAll();
+            UpdateInterface();
             return;
         }
 
@@ -247,14 +260,88 @@ public class ScalePuzzleController : MonoBehaviour
         if (!correct)
         {
             feedbackText.text = $"오답. 정답은 {oddIndex + 1}번 {OddKindText()} 추가 맞아.";
-            UpdateAll();
+            UpdateInterface();
             return;
         }
 
         solved = true;
         feedbackText.text = $"정답. {answerIndex + 1}번이 {OddKindText()} 추가 맞아.";
-        UpdateAll();
+        UpdateInterface();
         SolvedCorrectly?.Invoke(this);
+    }
+
+    private void ApplyLowEndOverlaySettings()
+    {
+        Canvas canvas = dragLayer != null
+            ? dragLayer.GetComponentInParent<Canvas>()
+            : GetComponentInParent<Canvas>();
+
+        if (canvas != null)
+        {
+            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            canvas.worldCamera = null;
+        }
+
+        Scene ownScene = gameObject.scene;
+        foreach (GameObject root in ownScene.GetRootGameObjects())
+        {
+            foreach (Camera camera in root.GetComponentsInChildren<Camera>(true))
+            {
+                camera.enabled = false;
+            }
+
+            foreach (AudioListener listener in root.GetComponentsInChildren<AudioListener>(true))
+            {
+                listener.enabled = false;
+            }
+
+            foreach (Shadow shadow in root.GetComponentsInChildren<Shadow>(true))
+            {
+                shadow.enabled = false;
+            }
+
+            foreach (Outline outline in root.GetComponentsInChildren<Outline>(true))
+            {
+                outline.enabled = false;
+            }
+
+            foreach (Graphic graphic in root.GetComponentsInChildren<Graphic>(true))
+            {
+                graphic.raycastTarget =
+                    graphic.GetComponent<Button>() != null
+                    || graphic.GetComponent<ScalePuzzleDropZone>() != null
+                    || graphic.GetComponent<ScalePuzzleWeightItem>() != null;
+            }
+        }
+
+        bool hasExternalEventSystem = false;
+        EventSystem[] eventSystems = FindObjectsOfType<EventSystem>(true);
+        foreach (EventSystem eventSystem in eventSystems)
+        {
+            if (eventSystem.gameObject.scene != ownScene && eventSystem.isActiveAndEnabled)
+            {
+                hasExternalEventSystem = true;
+                break;
+            }
+        }
+
+        if (!hasExternalEventSystem)
+        {
+            return;
+        }
+
+        foreach (GameObject root in ownScene.GetRootGameObjects())
+        {
+            foreach (EventSystem eventSystem in root.GetComponentsInChildren<EventSystem>(true))
+            {
+                eventSystem.enabled = false;
+            }
+
+            foreach (BaseInputModule inputModule in root.GetComponentsInChildren<BaseInputModule>(true))
+            {
+                inputModule.enabled = false;
+            }
+        }
     }
 
     private RectTransform GetZoneContent(Zone zone)
@@ -341,7 +428,7 @@ public class ScalePuzzleController : MonoBehaviour
         return delta > 0 ? "왼쪽 접시가 더 무거워." : "오른쪽 접시가 더 무거워.";
     }
 
-    private void UpdateAll()
+    private void UpdateInterface()
     {
         if (currentTemplate == null)
         {
@@ -354,7 +441,6 @@ public class ScalePuzzleController : MonoBehaviour
         historyText.text = history.Length == 0 ? "기록: 없음" : history.ToString();
 
         UpdateScaleVisual();
-        UpdateWeightVisuals();
         weighButton.interactable = !solved && remainingWeighs > 0;
         decideButton.interactable = !solved;
         resetButton.interactable = !solved;
@@ -380,21 +466,31 @@ public class ScalePuzzleController : MonoBehaviour
         }
     }
 
-    private void UpdateWeightVisuals()
+    private void RefreshAllWeights()
     {
         for (int i = 0; i < weights.Length; i++)
         {
-            bool active = i < currentTemplate.weightCount;
-            weights[i].gameObject.SetActive(active);
-            if (!active)
-            {
-                continue;
-            }
-
-            weights[i].SetNumber(i + 1);
-            weights[i].SetZone(placements[i]);
-            weights[i].SnapTo(GetZoneContent(placements[i]));
-            weights[i].transform.SetSiblingIndex(i);
+            RefreshWeight(i);
         }
+    }
+
+    private void RefreshWeight(int index)
+    {
+        if (index < 0 || index >= weights.Length || weights[index] == null || currentTemplate == null)
+        {
+            return;
+        }
+
+        bool active = index < currentTemplate.weightCount;
+        weights[index].gameObject.SetActive(active);
+        if (!active)
+        {
+            return;
+        }
+
+        weights[index].SetNumber(index + 1);
+        weights[index].SetZone(placements[index]);
+        weights[index].SnapTo(GetZoneContent(placements[index]));
+        weights[index].transform.SetSiblingIndex(index);
     }
 }

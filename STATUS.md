@@ -34,6 +34,11 @@
 - `ScalePuzzle` UI 문구를 한글로 바꾸고 `NotoSansKR-VF` 폰트를 `Assets/Fonts`에 추가해 한글 네모 표시를 피했다.
 - 기존 `Assets/_WIP/main` 개인 작업 폴더를 `Assets/_WIP/yongwoo`로 옮겨 메인 브랜치 이름과 개인 작업공간 이름이 섞이지 않게 했다.
 - 우리가 만든 `RefundRun_Platformer`, `ScalePuzzle`, 관련 트리거/퍼즐/빌더 스크립트를 `Assets/_WIP/yongwoo` 아래로 옮겼다.
+- 복구 기준 커밋 `3956542`에서 개인 작업 브랜치 `yongwoo`를 새로 만들었다.
+- `ScalePuzzle` 저사양 최적화 1차 적용: ScreenSpaceOverlay 전환, 퍼즐 씬 내부 Camera/AudioListener 비활성, Shadow/Outline 제거, 불필요한 UI raycastTarget 축소.
+- `ScalePuzzleController`의 무게추 갱신을 전체 12개 재배치 방식에서 이동한 추 중심 갱신으로 줄였다.
+- `ScalePuzzle.unity`를 저사양 UI 빌더 설정으로 재생성해 컴포넌트 수를 310개에서 270개로 줄였다.
+- 검증: `unity-cli safe_refresh --compile true`, `unity-cli console --type error`, ScalePuzzle 단독 Play Mode 진입/종료 에러 없음.
 
 ## 핵심 설계 결정
 
@@ -61,6 +66,7 @@
 - 하네스 install 스크립트가 Windows PowerShell에서 `manifest.json`을 BOM 포함 UTF-8로 저장해 Unity Package Manager가 한 번 JSON 오류를 냈다. 이 프로젝트의 `manifest.json`은 BOM 없는 UTF-8로 수정 완료.
 - 현재 퍼즐은 임시 아트 기반 UI다. 추/저울 전용 스프라이트를 넣으면 같은 드래그 로직 위에서 시각 품질만 교체 가능.
 - `RefundRun_Platformer`의 플랫폼은 아직 블록아웃 성격이다. 실제 레벨 디자인은 Inspector/Scene에서 위치와 간격을 추가 조정하면 된다.
+- 저사양 최적화는 ScalePuzzle 단독 씬 기준으로 검증했다. `RefundRun_Platformer`에서 additive overlay로 여는 전체 흐름은 다음 작업에서 다시 확인해야 한다.
 
 ## 세션 종료 시 갱신 규칙
 
