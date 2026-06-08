@@ -26,6 +26,12 @@ public class MemoryPuzzle : MonoBehaviour
     public int currentRound = 1;
     public int maxRounds = 3;
 
+    [Header("오디오 설정")] 
+    public AudioSource puzzleAudio;
+    public AudioClip clickSound;   
+    public AudioClip correctSound; 
+    public AudioClip wrongSound;
+
 
     // 왜 리스트를 쓰는가.
     // -> 배열은 처음에 크기를 정해야하지만, 리스트는 크기가 자유롭게 늘어남
@@ -93,6 +99,8 @@ public class MemoryPuzzle : MonoBehaviour
         statusText.text = "순서 기억하기!";
         foreach (int btnIndex in correctSequence)
         {
+            if (puzzleAudio != null && clickSound != null) puzzleAudio.PlayOneShot(clickSound);
+
             buttonImages[btnIndex].color = highlightColor;
             yield return new WaitForSeconds(0.5f);
 
@@ -108,6 +116,8 @@ public class MemoryPuzzle : MonoBehaviour
     {
         if (!isPlayerTurn) return;
 
+        if (puzzleAudio != null && clickSound != null) puzzleAudio.PlayOneShot(clickSound);
+
         if (clickIndex == correctSequence[playerStep])
         {
             playerStep++;
@@ -115,6 +125,8 @@ public class MemoryPuzzle : MonoBehaviour
 
             if (playerStep >= correctSequence.Count)
             {
+                if (puzzleAudio != null && correctSound != null) puzzleAudio.PlayOneShot(correctSound);
+
                 // 아직 마지막 라운드가 아니면 난이도를 올리고 다음 라운드로 진행
                 if (currentRound < maxRounds)
                 {
@@ -132,6 +144,7 @@ public class MemoryPuzzle : MonoBehaviour
         }
         else 
         {
+            if (puzzleAudio != null && wrongSound != null) puzzleAudio.PlayOneShot(wrongSound);
             Debug.Log("틀렸습니다! 현재 " + currentRound + "번째 라운드입니다.");
             StartCoroutine(RestartRoundRoutine());
         }

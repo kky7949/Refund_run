@@ -7,6 +7,13 @@ public class NewMoveCS : MonoBehaviour
     public float Speed = 8.0f;
     public float JumpForce = 12.0f;  //변수 선언
     public float lowJumpMultiplier = 0.5f;
+
+    [Header("오디오 설정")]
+    public AudioSource playerAudio;
+    public AudioClip jumpSound;
+
+   [Header("장애물 충돌 소리")]
+    public AudioClip[] obstacleCollisionSounds;
     
     private Rigidbody rb;   //물리엔진을 담당하는 컴포넌트
     private Animator anim;   //애니메이션을 담당하는 컴포넌트
@@ -26,6 +33,9 @@ public class NewMoveCS : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         anim = GetComponent<Animator>();
         startPosition = transform.position;
+
+        if (playerAudio != null) playerAudio = GetComponent<AudioSource>();
+
     }
 
 
@@ -72,6 +82,8 @@ public class NewMoveCS : MonoBehaviour
             rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z);
             rb.AddForce(Vector3.up * JumpForce, ForceMode.Impulse);
             isGrounded = false;
+
+            if (playerAudio != null && jumpSound != null) playerAudio.PlayOneShot(jumpSound);
         }
 
         if (Keyboard.current.spaceKey.wasReleasedThisFrame && rb.linearVelocity.y > 0)
@@ -104,6 +116,18 @@ public class NewMoveCS : MonoBehaviour
         anim.enabled = false;
 
         rb.constraints = RigidbodyConstraints.None;
+
+        if (obstacleCollisionSounds != null && obstacleCollisionSounds.Length > 0)
+        {
+            // 무작위로 하나의 소리 선택
+            int randomIndex = Random.Range(0, obstacleCollisionSounds.Length);
+            
+            // 플레이어 오디오 소스 및 선택된 클립이 존재하는지 확인 후 재생
+            if (playerAudio != null && obstacleCollisionSounds[randomIndex] != null)
+            {
+                playerAudio.PlayOneShot(obstacleCollisionSounds[randomIndex]);
+            }
+        }
 
         Vector3 flyDirection = new Vector3(
             Random.Range(-5f, 5f),  // 좌우로 랜덤하게

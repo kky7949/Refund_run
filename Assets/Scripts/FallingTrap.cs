@@ -10,6 +10,10 @@ public class FallingTrap : MonoBehaviour
     public float returnSpeed = 3.0f;
     public float extraFallForce = 50f;
 
+    [Header("오디오 설정")]
+    public AudioSource trapAudio;
+    public AudioClip hitGroundSound;
+
     private Rigidbody rb;
     private bool isTriggered = false;
     private bool isReturning = false;
@@ -25,6 +29,9 @@ public class FallingTrap : MonoBehaviour
             rb.useGravity = false;
         }
         startPosition = transform.position;
+
+        if (trapAudio == null) trapAudio = GetComponent<AudioSource>();
+
     }
 
     void Update()
@@ -60,6 +67,18 @@ public class FallingTrap : MonoBehaviour
         if (isTriggered && !isReturning && rb != null && rb.useGravity)
         {
             rb.AddForce(Vector3.down * extraFallForce, ForceMode.Acceleration);
+        }
+    }
+
+    void OnCollisionEnter(Collision collision)
+    {
+        if (isTriggered && collision.gameObject.CompareTag("Ground"))
+        {
+            if (trapAudio != null && hitGroundSound != null)
+            {
+                trapAudio.PlayOneShot(hitGroundSound);
+            }
+
         }
     }
 
