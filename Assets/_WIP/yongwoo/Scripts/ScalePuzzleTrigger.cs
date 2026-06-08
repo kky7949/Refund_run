@@ -1,11 +1,15 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+#if UNITY_EDITOR
+using UnityEditor.SceneManagement;
+#endif
 
 [RequireComponent(typeof(Collider))]
 public class ScalePuzzleTrigger : MonoBehaviour
 {
     [SerializeField] private string puzzleSceneName = "ScalePuzzle";
-    [SerializeField] private NewMoveCS playerMovement;
+    [SerializeField] private string puzzleScenePath = "Assets/_WIP/yongwoo/Scenes/ScalePuzzle.unity";
+    [SerializeField] private YongwooPlayerController playerMovement;
     [SerializeField] private bool disableAfterSolved = true;
 
     private bool loading;
@@ -46,7 +50,7 @@ public class ScalePuzzleTrigger : MonoBehaviour
 
     private void TryOpenFor(Collider other)
     {
-        var incomingPlayer = other.GetComponentInParent<NewMoveCS>();
+        var incomingPlayer = other.GetComponentInParent<YongwooPlayerController>();
         if (incomingPlayer == null)
         {
             return;
@@ -55,7 +59,7 @@ public class ScalePuzzleTrigger : MonoBehaviour
         TryOpenForPlayer(incomingPlayer);
     }
 
-    public void TryOpenForPlayer(NewMoveCS incomingPlayer)
+    public void TryOpenForPlayer(YongwooPlayerController incomingPlayer)
     {
         if (solved || loading || closing || incomingPlayer == null)
         {
@@ -107,7 +111,7 @@ public class ScalePuzzleTrigger : MonoBehaviour
                 continue;
             }
 
-            var overlappingPlayer = hit.GetComponentInParent<NewMoveCS>();
+            var overlappingPlayer = hit.GetComponentInParent<YongwooPlayerController>();
             if (overlappingPlayer == null)
             {
                 continue;
@@ -135,7 +139,12 @@ public class ScalePuzzleTrigger : MonoBehaviour
         {
             SceneManager.sceneLoaded -= HandleSceneLoaded;
             SceneManager.sceneLoaded += HandleSceneLoaded;
+#if UNITY_EDITOR
+            // Build Settings에 씬을 안 넣어도 에디터에서는 yongwoo 폴더의 씬 경로로 연다.
+            EditorSceneManager.LoadSceneAsyncInPlayMode(puzzleScenePath, new LoadSceneParameters(LoadSceneMode.Additive));
+#else
             SceneManager.LoadSceneAsync(puzzleSceneName, LoadSceneMode.Additive);
+#endif
             return;
         }
 

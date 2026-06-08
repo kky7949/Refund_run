@@ -12,7 +12,7 @@ public static class ScalePuzzleSceneBuilder
 {
     private const string ScenePath = "Assets/_WIP/yongwoo/Scenes/ScalePuzzle.unity";
     private const string FontSourcePath = "C:/Windows/Fonts/NotoSansKR-VF.ttf";
-    private const string FontCopyPath = "Assets/Fonts/NotoSansKR-VF.ttf";
+    private const string FontCopyPath = "Assets/_WIP/yongwoo/ExportAssets/Fonts/NotoSansKR-VF.ttf";
     private static readonly Color Background = new Color(0.10f, 0.12f, 0.15f);
     private static readonly Color Panel = new Color(0.18f, 0.21f, 0.25f, 0.94f);
     private static readonly Color PanelAlt = new Color(0.25f, 0.30f, 0.32f, 0.96f);
