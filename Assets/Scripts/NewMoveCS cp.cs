@@ -7,6 +7,7 @@ public class NewMoveCS : MonoBehaviour
     public float Speed = 8.0f;
     public float JumpForce = 12.0f;  //변수 선언
     public float lowJumpMultiplier = 0.5f;
+    public GameObject nextStageBtn;
 
     [Header("오디오 설정")]
     public AudioSource playerAudio;
@@ -105,6 +106,19 @@ public class NewMoveCS : MonoBehaviour
         else if (collision.gameObject.CompareTag("Obstacle") && !isDead)
         {
             DeathTrigger();
+        }
+
+        else if (collision.gameObject.CompareTag("OneLinePuzzleStart")) // **퍼즐 시작을 위한 조건 추가**
+        {
+            GetComponent<OneLinePuzzlePlayerController>().enabled = true;
+        }
+        else if (collision.gameObject.CompareTag("Trampoline")) // **트램펄린 기믹을 위한 조건 추가**
+        {
+            rb.AddForce(Vector3.up * 12.0f, ForceMode.Impulse);
+        }
+        else if (collision.gameObject.CompareTag("Goal")) // **스테이지 이동을 위한 조건 추가**
+        {
+            nextStageBtn.SetActive(true);
         }
     }
 
