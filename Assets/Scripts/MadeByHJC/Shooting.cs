@@ -1,5 +1,5 @@
 using JetBrains.Annotations;
-using UnityEditor.AdaptivePerformance.Editor;
+//using UnityEditor.AdaptivePerformance.Editor;
 using UnityEngine;
 
 public class Shooting : MonoBehaviour

@@ -1,5 +1,5 @@
 using Unity.Mathematics;
-using UnityEditor.Animations;
+//using UnityEditor.Animations;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -14,8 +14,8 @@ public class OneLinePuzzlePlayerController : MonoBehaviour
     public Material basicBlock;         // 기본 블록 재질
     public Material stepedBlock;        // 밟은 블록 재질
     public GameObject[] bridge = new GameObject[3];           // 퍼즐에 사용될 블록들
-    public AnimatorController puzzleAnimController;   // 퍼즐에서 사용할 애니메이션 컨트롤러
-    public AnimatorController basicAnimController;    // 기본 애니메이션 컨트롤러
+    public RuntimeAnimatorController puzzleAnimController;
+    public RuntimeAnimatorController basicAnimController;   // 기본 애니메이션 컨트롤러
     public GameObject smokePref;
     public GameObject explainPanel;
     public GameObject explainBtn;
